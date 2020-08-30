@@ -5,9 +5,11 @@ import { UserModule } from './user/user.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
     imports: [
+        ConfigModule.forRoot(),
         GraphQLModule.forRoot({
             typePaths: ['./**/*.graphql'],
             debug: true,
@@ -16,9 +18,12 @@ import { join } from 'path';
         }),
         TypeOrmModule.forRoot({
             type: 'mongodb',
-            url:
-                'mongodb+srv://user:cZPwEj6S8sSMVX9R@cluster0-wcpwy.mongodb.net/react-nestjs-mongodb-graphql',
-            validateOptions: { useUnifiedTopology: true },
+            url: process.env.DB_CONNECT_STRING,
+            validateOptions: {
+                useUnifiedTopology: true,
+                retryWrites: true,
+                w: 'majority',
+            },
             entities: [join(__dirname, '/**/*.entity{.ts,.js}')],
             synchronize: true,
             useNewUrlParser: true,
